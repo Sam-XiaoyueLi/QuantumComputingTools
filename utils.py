@@ -1,6 +1,6 @@
 import numpy as np
 import pytket.qasm
-import qrisp
+
 
 class LoadQasm:
     def __init__(self, filename):
@@ -24,19 +24,30 @@ class LoadQasm:
         """Return the unitary matrix corresponding to the circuit."""
         return self._unitary
 
-    def get_tket(self):
+    def to_tket(self):
         """Return the tket circuit."""
         return self._tket_circ
     
-    def get_qrisp(self):
+    def to_qrisp(self):
         """Return the qrisp circuit."""
-        return qrisp.QuantumCircuit.from_qasm_str(self._qasm_str)
+        from qrisp import QuantumCircuit
+        return QuantumCircuit.from_qasm_str(self._qasm_str)
+    
+    def to_qiskit(self):
+        """Return the qiskit circuit."""
+        from qiskit import QuantumCircuit
+        return QuantumCircuit.from_qasm_str(self._qasm_str)
+    
+    def to_qibo(self):
+        """Return the Qibo circuit."""
+        from qibo import Circuit
+        return Circuit.from_qasm(self._qasm_str)
 
     def get_statevector(self):
         """Return the computed statevector (as a NumPy array).
         
         ::
-        from utils import load_qasm
+        from utils import LoadQasm
         from qibo import hamiltonians
         vqe_file = 'VQE_circ_qasm/cobyla_10q_1l_XXZ/vqe_circ.qasm'
         vqe = LoadQasm(vqe_file)
