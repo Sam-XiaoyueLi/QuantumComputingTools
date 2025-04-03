@@ -1,9 +1,10 @@
 import numpy as np
-import pytket.qasm
+import pickle
 
 
 class LoadQasm:
     def __init__(self, filename):
+        import pytket.qasm
         # Load the QASM string from file
         with open(filename, 'r') as file:
             self._qasm_str = file.read()
@@ -47,7 +48,6 @@ class LoadQasm:
         """Return the computed statevector (as a NumPy array).
         
         ::
-        from utils import LoadQasm
         from qibo import hamiltonians
         vqe_file = 'VQE_circ_qasm/cobyla_10q_1l_XXZ/vqe_circ.qasm'
         vqe = LoadQasm(vqe_file)
@@ -77,3 +77,27 @@ def run_param_rc(fontsize = 23):
         plt.rcParams['text.usetex'] = True
         plt.rcParams['font.family'] = "serif"
         plt.rcParams['font.serif'] = "cm"
+        
+def save_data(data, filename):  
+    # Open a file for writing
+    with open(filename+'.pickle', 'wb') as file:
+        # Write the object to the file
+        pickle.dump(data, file)
+
+def load_data(filename):
+    with open(filename+'.pickle', 'rb') as file:
+        # Load the object from the file
+        data = pickle.load(file)
+    return data
+
+def state_to_dm(psi):
+    # column vector to density matrix
+    psi = psi.reshape(-1, 1)
+    return psi @ psi.conj().T
+
+def fidelity(rho, sigma) -> float:
+    # calculates the fidelity of 2 density matrices
+    # $F(\rho,\sigma) = (tr{\sqrt{\sqrt\rho \sigma \sqrt \rho}})^2$
+    import scipy
+    sqrt_rho = scipy.linalg.sqrtm(rho)
+    return (np.trace(scipy.linalg.sqrtm(sqrt_rho @ sigma @ sqrt_rho)).real)**2
